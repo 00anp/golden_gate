@@ -1,0 +1,26 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Pyenv
+.python-version
+
+# Datos sensibles
+data/passwords.json
+
+# Archivos de prueba
+TestData.xlsx
+
+# Flet
+.flet/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
