@@ -5,7 +5,7 @@ from ui.views.rules_view import build_rules_view
 from ui.views.history_view import build_history_view
 
 
-async def build_app(page: ft.Page) -> None:
+def build_app(page: ft.Page) -> None:
 
     page.title= "Golden Gate"
     page.window_width = 1100
@@ -16,14 +16,7 @@ async def build_app(page: ft.Page) -> None:
     file_picker = ft.FilePicker()
     folder_picker = ft.FilePicker()
 
-    page.overlay.append(file_picker)
-    page.overlay.append(file_picker)
-
-    content_area = ft.Container(
-        expand=True,
-        padding=20,
-        content=None
-    )
+    content_area = ft.Container(expand=True, padding=20)
 
     VIEWS = {
         0: lambda: build_process_view(page, file_picker, folder_picker),
@@ -33,17 +26,17 @@ async def build_app(page: ft.Page) -> None:
     }
 
 
-    async def navigate(index: int) -> None:
+    def navigate(index: int) -> None:
         view_builder =  VIEWS.get(index)
 
         if view_builder:
-            content_area.content = await view_builder()
+            content_area.content = view_builder()
             content_area.update()
 
 
-    async def on_navigation_change(event) -> None:
+    def on_navigation_change(event) -> None:
         index =  event.control.selected_index
-        await navigate(index)
+        navigate(index)
 
 
     navigation_rail = ft.NavigationRail(
@@ -55,23 +48,23 @@ async def build_app(page: ft.Page) -> None:
 
         destinations=[
             ft.NavigationRailDestination(
-                icon=ft.Icons.UPLOAD_FILE_OUTLINED,
-                selected_icon=ft.Icons.UPLOAD_FILE,
+                icon=ft.icons.UPLOAD_FILE_OUTLINED,
+                selected_icon=ft.icons.UPLOAD_FILE,
                 label="Process"
             ),
             ft.NavigationRailDestination(
-                icon=ft.Icons.LOCK_OUTLINE,
-                selected_icon=ft.Icons.LOCK,
+                icon=ft.icons.LOCK_OUTLINE,
+                selected_icon=ft.icons.LOCK,
                 label="Passwords"
             ),
             ft.NavigationRailDestination(
-                icon=ft.Icons.RULE_OUTLINED,
-                selected_icon=ft.Icons.RULE,
+                icon=ft.icons.RULE_OUTLINED,
+                selected_icon=ft.icons.RULE,
                 label="Business Rules"
             ),
             ft.NavigationRailDestination(
-                icon=ft.Icons.HISTORY_OUTLINED,
-                selected_icon=ft.Icons.HISTORY,
+                icon=ft.icons.HISTORY_OUTLINED,
+                selected_icon=ft.icons.HISTORY,
                 label="Records"
             ),
         ]
@@ -85,7 +78,11 @@ async def build_app(page: ft.Page) -> None:
                 content_area,
             ],
             expand=True,
-        )
+        ),
     )
+    
+    page.overlay.append(file_picker)
+    page.overlay.append(folder_picker)
+    page.update()
 
-    await navigate(0)
+    navigate(0)

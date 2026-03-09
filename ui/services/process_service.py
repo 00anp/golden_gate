@@ -1,4 +1,3 @@
-import asyncio
 import threading
 import time
 import os
@@ -17,24 +16,19 @@ def run_full_pipeline(
 ) -> None:
     
     def _worker() -> None:
-        def call(coro):
-            asyncio.run_coroutine_threadsafe(
-                coro,
-                loop=asyncio.get_event_loop()
-            )
         start = time.time()
 
         try:
-            call(on_status("Starting process..."))
-            call(on_progress(0.0))
+            on_status("Starting process...")
+            on_progress(0.0)
 
             processed_wb = process_file(
                 input_path= input_path, 
-                progress_callback= lambda v: call(on_progress(v)), 
-                status_callback= lambda m: call(on_status(m)),
+                progress_callback= on_progress, 
+                status_callback= on_status,
             )
 
-            call(on_status("Splitting files by company..."))
+            on_status("Splitting files by company...")
 
             created_files: list[str] = split_and_protect(
                 processed_wb= processed_wb,
@@ -50,12 +44,12 @@ def run_full_pipeline(
                 success= True,
                 total_rows= processed_wb.active.max_row - 1,
                 files_created= len(created_files),
-                companies_found= [os.path.basename(filepath).split("_")[0] for filepath in created_files],
+                companies_found= [os.path.basename(f).split("_")[0] for f in created_files],
                 created_files= created_files,
-                status_callback = on_status,
+                duration_seconds= duration,
             )
 
-            call(on_complete(results))
+            on_complete(results)
 
         except Exception as error:
             results_error = ProcessResult(
@@ -63,7 +57,7 @@ def run_full_pipeline(
                 errors=[str(error)],
             )
 
-            call(on_complete(results_error))
+            on_complete(results_error)
     
     thread = threading.Thread(target=_worker, daemon=True)
     thread.start()
