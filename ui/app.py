@@ -8,9 +8,9 @@ from ui.views.history_view import build_history_view
 def build_app(page: ft.Page) -> None:
 
     page.title= "Golden Gate"
-    page.window_width = 1100
-    page.window_height = 700
-    page.window_min_width = 800
+    page.window_width = 1400
+    page.window_height = 1100
+    page.window_min_width = 1200
     page.padding = 0
 
     file_picker = ft.FilePicker()
