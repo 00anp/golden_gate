@@ -113,7 +113,7 @@ def open_settlement_dialog(
                 description_field,
             ],
             spacing= 16,
-            width= 480,
+            width= 780,
             tight=True,
         ),
         actions=[

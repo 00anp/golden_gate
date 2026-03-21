@@ -8,7 +8,7 @@ from ui.views.history_view import build_history_view
 def build_app(page: ft.Page) -> None:
 
     page.title= "Golden Gate"
-    page.window_width = 1400
+    page.window_width = 1700
     page.window_height = 1100
     page.window_min_width = 1200
     page.padding = 0
@@ -21,7 +21,7 @@ def build_app(page: ft.Page) -> None:
     VIEWS = {
         0: lambda: build_process_view(page, file_picker, folder_picker),
         1: build_passwords_view,
-        2: build_rules_view,
+        2: lambda: build_rules_view(page),
         3: build_history_view,
     }
 

@@ -80,6 +80,7 @@ def open_tiers_dialog(
                 ft.Row(controls=[payment_field, term_field, term_lpl_field]),
             ],
             spacing=16,
+            width= 780,
             tight= True,
         ),
         actions= [

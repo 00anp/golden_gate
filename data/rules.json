@@ -1,0 +1,254 @@
+{
+  "settlement_rules": [
+    {
+      "prefix": "VIL",
+      "balance_threshold": 5000,
+      "z_high": 0.45,
+      "ak_high": 0.4,
+      "z_low": 0.5,
+      "ak_low": 0.45,
+      "mark_am": true,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "VIL — threshold $5,000"
+    },
+    {
+      "prefix": "CKS",
+      "balance_threshold": 5000,
+      "z_high": 0.45,
+      "ak_high": 0.4,
+      "z_low": 0.5,
+      "ak_low": 0.45,
+      "mark_am": true,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "CKS — threshold $5,000"
+    },
+    {
+      "prefix": "FFAM",
+      "balance_threshold": 5000,
+      "z_high": 0.45,
+      "ak_high": 0.4,
+      "z_low": 0.5,
+      "ak_low": 0.45,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "FFAM — only applies if Z > 0.45"
+    },
+    {
+      "prefix": "OLU",
+      "balance_threshold": 5000,
+      "z_high": 0.45,
+      "ak_high": 0.4,
+      "z_low": 0.5,
+      "ak_low": 0.45,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "OLU — threshold $5,000"
+    },
+    {
+      "prefix": "OLI",
+      "balance_threshold": 5000,
+      "z_high": 0.45,
+      "ak_high": 0.4,
+      "z_low": 0.5,
+      "ak_low": 0.45,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "OLI — threshold $5,000"
+    },
+    {
+      "prefix": "CAG",
+      "balance_threshold": 5000,
+      "z_high": 0.45,
+      "ak_high": 0.4,
+      "z_low": 0.5,
+      "ak_low": 0.45,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "CAG — threshold $5,000"
+    },
+    {
+      "prefix": "LPL",
+      "balance_threshold": 0,
+      "z_high": 0.45,
+      "ak_high": 0.45,
+      "z_low": 0.45,
+      "ak_low": 0.45,
+      "mark_am": false,
+      "mark_aq": true,
+      "copy_z_to_ak": false,
+      "description": "LPL — fixed rate, mark AQ"
+    },
+    {
+      "prefix": "GAM",
+      "balance_threshold": 1250,
+      "z_high": 0.45,
+      "ak_high": 0.4,
+      "z_low": 0.5,
+      "ak_low": 0.45,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "GAM — threshold $1,250"
+    },
+    {
+      "prefix": "SMF",
+      "balance_threshold": 0,
+      "z_high": 0.5,
+      "ak_high": 0.45,
+      "z_low": 0.5,
+      "ak_low": 0.45,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "SMF — fixed rate Z=0.50"
+    },
+    {
+      "prefix": "SCS",
+      "balance_threshold": 1250,
+      "z_high": 0.45,
+      "ak_high": 0.4,
+      "z_low": 0.5,
+      "ak_low": 0.45,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "SCS — threshold $1,250"
+    },
+    {
+      "prefix": "RSG",
+      "balance_threshold": 0,
+      "z_high": 0.6,
+      "ak_high": 0.55,
+      "z_low": 0.6,
+      "ak_low": 0.55,
+      "mark_am": true,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "RSG — mark AM, Z=0.60"
+    },
+    {
+      "prefix": "NDH",
+      "balance_threshold": 0,
+      "z_high": 0,
+      "ak_high": 0,
+      "z_low": 0,
+      "ak_low": 0,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": true,
+      "description": "NDH — copy Z to AK"
+    },
+    {
+      "prefix": "GSG",
+      "balance_threshold": 0,
+      "z_high": 0,
+      "ak_high": 0,
+      "z_low": 0,
+      "ak_low": 0,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": true,
+      "description": "GSG — copy Z to AK"
+    },
+    {
+      "prefix": "CAV",
+      "balance_threshold": 0,
+      "z_high": 0,
+      "ak_high": 0,
+      "z_low": 0,
+      "ak_low": 0,
+      "mark_am": true,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "CAV — copy Z to AK"
+    },
+    {
+      "prefix": "CAQ",
+      "balance_threshold": 0,
+      "z_high": 0,
+      "ak_high": 0,
+      "z_low": 0,
+      "ak_low": 0,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": true,
+      "description": "CAQ — copy Z to AK"
+    },
+    {
+      "prefix": "CSF",
+      "balance_threshold": 0,
+      "z_high": 0,
+      "ak_high": 0,
+      "z_low": 0,
+      "ak_low": 0,
+      "mark_am": false,
+      "mark_aq": false,
+      "copy_z_to_ak": true,
+      "description": "CSF — copy Z to AK"
+    }
+  ],
+  "payment_tiers": [
+    {
+      "min_settlement": 0,
+      "max_settlement": 999.99,
+      "min_payment": 50,
+      "max_term_default": 6,
+      "max_term_lpl": 12
+    },
+    {
+      "min_settlement": 1000,
+      "max_settlement": 2500,
+      "min_payment": 50,
+      "max_term_default": 12,
+      "max_term_lpl": 12
+    },
+    {
+      "min_settlement": 2500.01,
+      "max_settlement": 5000,
+      "min_payment": 50,
+      "max_term_default": 18,
+      "max_term_lpl": 24
+    },
+    {
+      "min_settlement": 5000.01,
+      "max_settlement": 7500,
+      "min_payment": 75,
+      "max_term_default": 24,
+      "max_term_lpl": 24
+    },
+    {
+      "min_settlement": 7500.01,
+      "max_settlement": 10000,
+      "min_payment": 100,
+      "max_term_default": 30,
+      "max_term_lpl": 24
+    },
+    {
+      "min_settlement": 10000.01,
+      "max_settlement": 15000,
+      "min_payment": 125,
+      "max_term_default": 36,
+      "max_term_lpl": 24
+    },
+    {
+      "min_settlement": 15000.01,
+      "max_settlement": 25000,
+      "min_payment": 200,
+      "max_term_default": 36,
+      "max_term_lpl": 24
+    },
+    {
+      "min_settlement": 25000.01,
+      "max_settlement": "inf",
+      "min_payment": 250,
+      "max_term_default": 36,
+      "max_term_lpl": 24
+    }
+  ]
+}
