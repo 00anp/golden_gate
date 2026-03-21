@@ -1,7 +1,7 @@
 import flet as ft
 from ui.views.process_view import build_process_view
 from ui.views.passwords_view import build_passwords_view
-from ui.views.rules_view import build_rules_view
+from ui.views.rules.rules_view import build_rules_view
 from ui.views.history_view import build_history_view
 
 
