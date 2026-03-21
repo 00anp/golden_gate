@@ -20,7 +20,7 @@ DEFAULT_SETTLEMENT_RULES: list[SettlementRule] = [
     SettlementRule("RSG",  0,    0.60, 0.55, 0.60, 0.55, mark_am=True, description="RSG — mark AM, Z=0.60"),
     SettlementRule("NDH",  0,    0,    0,    0,    0,    copy_z_to_ak=True, description="NDH — copy Z to AK"),
     SettlementRule("GSG",  0,    0,    0,    0,    0,    copy_z_to_ak=True, description="GSG — copy Z to AK"),
-    SettlementRule("CAV",  0,    0,    0,    0,    0,    review_column=19, mark_am=True, value_to_review="7GMC01", description="CAV — copy Z to AK"),
+    SettlementRule("CAV",  0,    0,    0,    0,    0,    review_column=19, mark_am=True, value_to_review="7GMC01", copy_z_to_ak=True, description="CAV — mark AM if 7GMC01, else copy Z to AK"),
     SettlementRule("CAQ",  0,    0,    0,    0,    0,    copy_z_to_ak=True, description="CAQ — copy Z to AK"),
     SettlementRule("CSF",  0,    0,    0,    0,    0,    copy_z_to_ak=True, description="CSF — copy Z to AK"),
 ]

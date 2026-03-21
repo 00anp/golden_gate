@@ -165,8 +165,8 @@
       "ak_low": 0,
       "mark_am": true,
       "mark_aq": false,
-      "copy_z_to_ak": false,
-      "description": "CAV — copy Z to AK"
+      "copy_z_to_ak": true,
+      "description": "CAV — mark AM if 7GMC01, else copy Z to AK"
     },
     {
       "prefix": "CAQ",

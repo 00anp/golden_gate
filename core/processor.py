@@ -14,14 +14,17 @@ def apply_settlement_rules(ws, row:int, settlement_rules):
     if rule is None:
         ws.cell(row=row, column=37).value = current_pct
         return
+    
     if rule.review_column is not None:
         column = ws.cell(row=row, column=rule.review_column).value
         if column == rule.value_to_review:
             ws.cell(row=row, column=39).value = "X"
             return
+        
     if rule.copy_z_to_ak:
         ws.cell(row=row, column=37).value = current_pct
         return
+    
     if rule.z_greater_than_threshold:
         if current_pct > 0.45 and balance > rule.balance_threshold:
             ws.cell(row=row, column=26).value = rule.z_high
@@ -32,11 +35,16 @@ def apply_settlement_rules(ws, row:int, settlement_rules):
         elif current_pct <= 0.45:
             pass
         handled = True
+
     if rule.z_lower_than_threshold:
         if current_pct < 0.45:
             ws.cell(row=row, column=37).value = current_pct
         elif current_pct == 0.45:
-            ws.cell(row=row, column=37).value = 0.40
+            if rule.balance_threshold > 0:
+                ws.cell(row=row, column=37).value = rule.ak_high
+            else:
+                ws.cell(row=row, column=26).value = rule.z_high
+                ws.cell(row=row, column=37).value = rule.ak_high
         elif current_pct > 0.45 and balance > rule.balance_threshold:
             ws.cell(row=row, column=26).value = rule.z_high
             ws.cell(row=row, column=37).value = rule.ak_high
@@ -140,5 +148,3 @@ def process_file(input_path:str, progress_callback=None, status_callback=None)->
     
     update(0.85, "Business logic applied successfully.")
     return wb, rules_applied
-
-    
