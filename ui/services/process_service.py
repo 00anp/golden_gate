@@ -4,6 +4,7 @@ import os
 from core.processor import process_file
 from core.splitter import split_and_protect
 from core.models import ProcessResult
+from ui.services.history_service import save_history_entry
 
 
 def run_full_pipeline(
@@ -22,7 +23,7 @@ def run_full_pipeline(
             on_status("Starting process...")
             on_progress(0.0)
 
-            processed_wb = process_file(
+            processed_wb, rules_applied = process_file(
                 input_path= input_path, 
                 progress_callback= on_progress, 
                 status_callback= on_status,
@@ -47,7 +48,16 @@ def run_full_pipeline(
                 companies_found= [os.path.basename(f).split("_")[0] for f in created_files],
                 created_files= created_files,
                 duration_seconds= duration,
+                rules_applied= rules_applied,
             )
+            
+            if results.success:
+                save_history_entry(
+                    files_created= results.files_created,
+                    companies_found= results.companies_found,
+                    duration_seconds= results.duration_seconds,
+                    rules_applied= results.rules_applied,
+                )
 
             on_complete(results)
 

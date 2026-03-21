@@ -45,3 +45,4 @@ class ProcessResult:
     errors: list = field(default_factory=list)
     warnings: list = field(default_factory=list)
     duration_seconds: float =  0.0
+    rules_applied: dict[str, int] = field(default_factory=dict)

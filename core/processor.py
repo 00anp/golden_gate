@@ -74,7 +74,7 @@ def apply_payment_terms(ws, row:int, settlement, payment_tiers):
         ws.cell(row=row, column=15).value = tier.max_term_default
 
 
-def process_file(input_path:str, progress_callback=None, status_callback=None)-> openpyxl.Workbook:
+def process_file(input_path:str, progress_callback=None, status_callback=None)-> tuple[openpyxl.Workbook, dict[str, int]]:
 
     def update(pct: float, msg: str):
         if status_callback:
@@ -87,6 +87,8 @@ def process_file(input_path:str, progress_callback=None, status_callback=None)->
     update(0.0, "Opening file...")
     wb = openpyxl.load_workbook(input_path) 
     ws = wb.active
+
+    rules_applied: dict[str, int] = {}
 
     update(0.05, "Renaming headers...")
     for col_letter, name in HEADERS.items():
@@ -110,6 +112,12 @@ def process_file(input_path:str, progress_callback=None, status_callback=None)->
         # Copy col AD to col AO
         ws.cell(row=i, column=41).value = ws.cell(row=i, column=30).value
 
+        gmc_prefix = safe_str(ws.cell(row=i, column=17).value)
+        rule = get_rule(settlement_rules, gmc_prefix)
+        
+        if rule is not None:
+            rules_applied[rule.prefix] = rules_applied.get(rule.prefix, 0) + 1
+
         apply_settlement_rules(ws, i, settlement_rules)
 
         z_val  = safe_float(ws.cell(row=i, column=26).value)
@@ -131,6 +139,6 @@ def process_file(input_path:str, progress_callback=None, status_callback=None)->
             update(progress_pct, f"Processing row {i} of {last_row}...")
     
     update(0.85, "Business logic applied successfully.")
-    return wb
+    return wb, rules_applied
 
     
