@@ -12,14 +12,16 @@ def _to_dict(cp: CompanyPassword) -> dict:
         "company": cp.company,
         "password": cp.password,
         "requires_password": cp.requires_password,
+        "delivery_method": cp.delivery_method,
     }
 
 
 def _from_dict(data: dict) -> CompanyPassword:
     return CompanyPassword(
-        company= data["company"],
-        password= data.get("password", ""),
-        requires_password= data.get("requires_password", False),
+        company=data["company"],
+        password=data.get("password", ""),
+        requires_password=data.get("requires_password", True),
+        delivery_method=data.get("delivery_method", "requires_password"),
     )
 
 

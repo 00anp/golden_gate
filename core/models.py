@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 
 
+DELIVERY_REQUIRES_PASSWORD = "requires_password"
+DELIVERY_SFTP = "sftp"
+DELIVERY_SFTP_WITH_PASSWORD = "sftp_with_password"
 
 @dataclass
 class SettlementRule:
@@ -17,6 +20,7 @@ class SettlementRule:
     mark_aq: bool = False
     copy_z_to_ak: bool = False
     value_to_review: str = ""
+    enabled: bool = True
     description: str = ""
 
 
@@ -33,7 +37,9 @@ class PaymentTier:
 class CompanyPassword:
     company: str
     password: str = ""
-    requires_password: bool = False
+    requires_password: bool = True
+    delivery_method: str = "requires_password"
+    # Valid values: "requires_password" | "sftp" | "sftp_with_password"
 
 @dataclass
 class ProcessResult:

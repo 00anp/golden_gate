@@ -1,91 +1,129 @@
 import os
 import io
+import datetime
 import msoffcrypto
 import openpyxl
-from datetime import datetime
 from core.helpers import EXPORT_COLUMNS, col_letter_to_index, safe_str
+from core.models import (
+    DELIVERY_REQUIRES_PASSWORD,
+    DELIVERY_SFTP,
+    DELIVERY_SFTP_WITH_PASSWORD,
+)
+
+FOLDER_NAMES = {
+    DELIVERY_REQUIRES_PASSWORD:  "Requires password",
+    DELIVERY_SFTP:               "SFTP",
+    DELIVERY_SFTP_WITH_PASSWORD: "SFTP with password",
+}
+
+DEFAULT_PASSWORD = "Glass2025!"
 
 
-def get_unique_dsc_company(ws) -> list:
-    dsc_companies_set:set = set()
-    dsc_companies:list = []
-    last_row:int = ws.max_row
-    for i in range(2, last_row+1):
-        company = safe_str(ws.cell(row=i, column=1).value)
-        if company not in dsc_companies_set:
-            dsc_companies_set.add(company)
-            dsc_companies.append(company)
-    return dsc_companies
+def get_unique_dsc_company(ws) -> list[str]:
+    """Returns a sorted list of unique values from column A (DSC company)."""
+    companies = set()
+    for i in range(2, ws.max_row + 1):
+        value = safe_str(ws.cell(i, 1).value)
+        if value:
+            companies.add(value)
+    return sorted(companies)
 
 
-def build_export_workbook(source_ws, company_value:str)-> openpyxl.Workbook:
+def build_export_workbook(ws, company: str) -> openpyxl.Workbook:
+    """Builds a new workbook containing only rows matching company,
+    with only the EXPORT_COLUMNS columns."""
+    col_indices = [col_letter_to_index(c) for c in EXPORT_COLUMNS]
+
     new_wb = openpyxl.Workbook()
     new_ws = new_wb.active
-    new_ws.title = "Data"
 
-    new_index:list = [col_letter_to_index(col) for col in EXPORT_COLUMNS]
+    # Write header row
+    header_row = [ws.cell(1, idx).value for idx in col_indices]
+    new_ws.append(header_row)
 
-    for out_col, src_col_idx in enumerate(new_index, start=1):
-        cell = new_ws.cell(row=1, column=out_col)
-        cell.value =source_ws.cell(row=1, column=src_col_idx).value
-        cell.font = openpyxl.styles.Font(bold=True)
+    # Write matching data rows
+    for i in range(2, ws.max_row + 1):
+        if safe_str(ws.cell(i, 1).value) == company:
+            row_data = [ws.cell(i, idx).value for idx in col_indices]
+            new_ws.append(row_data)
 
-    out_row = 2
-    for src_row in range(2, source_ws.max_row + 1):
-        row_company = safe_str(source_ws.cell(row=src_row, column=1).value)
-        if row_company ==  company_value:
-            for out_col, src_col_idx in enumerate(new_index, start=1):
-                new_ws.cell(row=out_row, column=out_col).value = \
-                    source_ws.cell(row=src_row, column=src_col_idx).value
-            out_row += 1
-    
     return new_wb
 
 
-def protect_xlsx_with_password(wb, password:str):
-    plain_buffer= io.BytesIO()
-    wb.save(plain_buffer)
-    plain_buffer.seek(0)
-    encrypted_buffer = io.BytesIO()
-    msoffcrypto.OfficeFile(plain_buffer).encrypt(password, encrypted_buffer)
-    encrypted_buffer.seek(0)
-    return encrypted_buffer.read()
+def protect_xlsx_with_password(wb: openpyxl.Workbook, password: str) -> bytes:
+    """Saves workbook to an in-memory buffer and encrypts it with msoffcrypto."""
+    buffer = io.BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+
+    encrypted = io.BytesIO()
+    office_file = msoffcrypto.OfficeFile(buffer)
+    office_file.encrypt(password, encrypted)
+    return encrypted.getvalue()
 
 
-def split_and_protect(processed_wb, output_folder, passwords:dict, progress_callback, status_callback):
-    def update(pct: float, msg: str):
-        if status_callback:
-            status_callback(msg)
-        if progress_callback:
-            progress_callback(pct)
+def split_and_protect(
+    processed_wb,
+    output_folder: str,
+    passwords: dict,
+    progress_callback: callable,
+    status_callback: callable,
+) -> list[str]:
+    """Splits the processed workbook by company, applies passwords,
+    and routes each file to the correct delivery subfolder."""
 
-    ws = processed_wb.active
-    timestamp:str = datetime.now().strftime("%Y_%m_%d_%H_%M")
-    directory_path:str = f"{output_folder}/{timestamp}"
-    os.makedirs(directory_path, exist_ok=True)
+    ws        = processed_wb.active
+    timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
+    base_dir  = os.path.join(output_folder, timestamp)
+
+    # Create all 3 subfolders upfront
+    for folder_name in FOLDER_NAMES.values():
+        os.makedirs(os.path.join(base_dir, folder_name), exist_ok=True)
+
+    companies     = get_unique_dsc_company(ws)
     created_files = []
-    companies:list = get_unique_dsc_company(ws)
-    if not companies:
-        update(0.0, "Warning: Couldn't get companies.")
-    num_companies:int = len(companies)
-    
-    progress:float = 0.88
-    update(progress, f"{num_companies} found and ready to process.")
-    for i, company in enumerate(companies):
-        calc_i:float = (1.00-progress)/num_companies 
-        company_wb = build_export_workbook(source_ws=ws, company_value=company)
-        filename = f"{company}_NEW_GMC_{timestamp}.xlsx"
-        filepath = os.path.join(directory_path, filename)
-        company_pwd = passwords.get(company)
-        if company_pwd and company_pwd.requires_password:
-            protected_file = protect_xlsx_with_password(company_wb, company_pwd.password)
-            with open(filepath, "wb") as f:
-                f.write(protected_file)
-            created_files.append(filepath)
+    progress      = 0.88
+
+    for company in companies:
+        step        = (1.0 - progress) / max(len(companies), 1)
+        company_wb  = build_export_workbook(ws, company)
+        filename    = f"{company}_NEW_GMC_{timestamp}.xlsx"
+        company_cfg = passwords.get(company)
+
+        # Determine delivery method (default: requires_password)
+        if company_cfg is not None:
+            method = company_cfg.delivery_method
         else:
+            method = DELIVERY_REQUIRES_PASSWORD
+
+        folder_name = FOLDER_NAMES[method]
+        filepath    = os.path.join(base_dir, folder_name, filename)
+
+        if method == DELIVERY_SFTP:
+            # No password — save plain
             company_wb.save(filepath)
-            created_files.append(filepath)
-        progress+=calc_i
-        update(progress, f"{company} complete")
-    update(1.0, "Process complete...")
+
+        elif method == DELIVERY_REQUIRES_PASSWORD:
+            # Use configured password or DEFAULT_PASSWORD
+            pwd       = (company_cfg.password if (company_cfg and company_cfg.password)
+                         else DEFAULT_PASSWORD)
+            protected = protect_xlsx_with_password(company_wb, pwd)
+            with open(filepath, "wb") as f:
+                f.write(protected)
+
+        elif method == DELIVERY_SFTP_WITH_PASSWORD:
+            # Password-protected but goes to SFTP folder
+            pwd       = (company_cfg.password if (company_cfg and company_cfg.password)
+                         else DEFAULT_PASSWORD)
+            protected = protect_xlsx_with_password(company_wb, pwd)
+            with open(filepath, "wb") as f:
+                f.write(protected)
+
+        created_files.append(filepath)
+        progress += step
+        progress_callback(progress)
+        status_callback(f"{company} → {folder_name}")
+
+    progress_callback(1.0)
+    status_callback("Process complete.")
     return created_files

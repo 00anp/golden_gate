@@ -191,6 +191,18 @@
       "mark_aq": false,
       "copy_z_to_ak": true,
       "description": "CSF — copy Z to AK"
+    },
+    {
+      "prefix": "VIL",
+      "balance_threshold": 20000.0,
+      "z_high": 0.45,
+      "ak_high": 0.4,
+      "z_low": 0.0,
+      "ak_low": 0.0,
+      "mark_am": true,
+      "mark_aq": false,
+      "copy_z_to_ak": false,
+      "description": "VIL - High balance"
     }
   ],
   "payment_tiers": [
