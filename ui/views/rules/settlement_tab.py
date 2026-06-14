@@ -113,13 +113,20 @@ def build_settlement_tab(page: ft.Page) -> ft.Container:
             return all_rules
         return [r for r in all_rules if query in r.prefix.upper()]
 
-    def refresh_table() -> None:
+    def populate_table() -> None:
+        """Rebuilds the table contents WITHOUT calling .update().
+        Safe to use during the initial build (control not yet on the page)."""
         rules = get_filtered_rules()
         table_container.controls = [
             build_settlement_table(
                 rules, sort_ascending[0], on_edit, on_delete, on_toggle, on_sort_toggled
             )
         ]
+
+    def refresh_table() -> None:
+        """Event-driven refresh: rebuild + push to the UI.
+        Only call this once the control is already attached to the page."""
+        populate_table()
         table_container.update()
 
     def on_sort_toggled() -> None:
@@ -145,8 +152,8 @@ def build_settlement_tab(page: ft.Page) -> ft.Container:
     def on_add_clicked(event: ft.ControlEvent) -> None:
         open_settlement_dialog(page, None, on_save=refresh_table)
 
-    # Initial load
-    refresh_table()
+    # Initial load — populate WITHOUT update (control is not on the page yet)
+    populate_table()
 
     return ft.Container(
         content=ft.Column(

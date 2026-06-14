@@ -16,7 +16,13 @@ def build_process_tabs(
     file_picker:   ft.FilePicker,
     folder_picker: ft.FilePicker,
 ) -> ft.Column:
-    """Builds the 3-tab Process workflow: File → Review → Analysis."""
+    """Builds the 3-tab Process workflow: File -> Review -> Analysis.
+
+    NOTE: Flet 0.24.1's ft.Tab does NOT support the `disabled` parameter
+    (it was added in a later release). To keep the same step-gating UX,
+    tabs are appended progressively to `tabs.tabs` instead of being
+    pre-created in a disabled state.
+    """
 
     # Shared state
     state = {
@@ -30,14 +36,16 @@ def build_process_tabs(
     progress_section = build_progress_bar()
     status_label     = build_status_label()
 
-    # Tab content placeholders
+    # Tab content placeholders (no `disabled` kwarg — not supported in 0.24.1)
     tab_file     = ft.Tab(text="1. File",     content=ft.Container())
-    tab_review   = ft.Tab(text="2. Review",   content=ft.Container(), disabled=True)
-    tab_analysis = ft.Tab(text="3. Analysis", content=ft.Container(), disabled=True)
+    tab_review   = ft.Tab(text="2. Review",   content=ft.Container())
+    tab_analysis = ft.Tab(text="3. Analysis", content=ft.Container())
 
+    # Start with only the first tab available; the others are appended
+    # as each step is completed.
     tabs = ft.Tabs(
         selected_index=0,
-        tabs=[tab_file, tab_review, tab_analysis],
+        tabs=[tab_file],
         expand=True,
     )
 
@@ -58,9 +66,13 @@ def build_process_tabs(
             state["wb"] = wb
             state["ws"] = ws
 
-            tab_review.content  = build_prefilter_tab(ws, on_review_next)
-            tab_review.disabled = False
-            status_label.value  = "File loaded. Review flagged rows."
+            tab_review.content = build_prefilter_tab(ws, on_review_next)
+
+            # Add the Review tab only if it isn't there yet
+            if tab_review not in tabs.tabs:
+                tabs.tabs.append(tab_review)
+
+            status_label.value = "File loaded. Review flagged rows."
             status_label.update()
             tabs.update()
             go_to_tab(1)
@@ -70,10 +82,14 @@ def build_process_tabs(
     def on_review_next(rows_to_remove: set[int]) -> None:
         state["rows_to_remove"] = rows_to_remove
 
-        tab_analysis.content  = build_analysis_tab(
+        tab_analysis.content = build_analysis_tab(
             page, state["ws"], rows_to_remove, on_process
         )
-        tab_analysis.disabled = False
+
+        # Add the Analysis tab only if it isn't there yet
+        if tab_analysis not in tabs.tabs:
+            tabs.tabs.append(tab_analysis)
+
         tabs.update()
         go_to_tab(2)
 
