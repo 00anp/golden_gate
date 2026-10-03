@@ -51,6 +51,12 @@ class FilterSettings:
 
 
 @dataclass
+class AppSettings:
+    """Application-wide settings persisted to app_settings.json."""
+    default_password: str = "Glass2025!"
+
+
+@dataclass
 class ProcessResult:
     success: bool
     total_rows: int = 0
