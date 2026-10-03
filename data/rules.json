@@ -37,7 +37,7 @@
       "mark_aq": false,
       "copy_z_to_ak": false,
       "enabled": true,
-      "description": "FFAM — only applies if Z > 0.45"
+      "description": "FFAM — only applies if SIF > 0.45"
     },
     {
       "prefix": "OLU",
@@ -89,7 +89,7 @@
       "mark_aq": true,
       "copy_z_to_ak": false,
       "enabled": true,
-      "description": "LPL — fixed rate, mark AQ"
+      "description": "LPL — fixed rate, mark Precharge Off"
     },
     {
       "prefix": "GAM",
@@ -115,7 +115,7 @@
       "mark_aq": false,
       "copy_z_to_ak": false,
       "enabled": true,
-      "description": "SMF — fixed rate Z=0.50"
+      "description": "SMF — fixed rate SIF=0.50"
     },
     {
       "prefix": "SCS",
@@ -141,7 +141,7 @@
       "mark_aq": false,
       "copy_z_to_ak": false,
       "enabled": true,
-      "description": "RSG — mark AM, Z=0.60"
+      "description": "RSG — mark Prelit, SIF=0.60"
     },
     {
       "prefix": "NDH",
@@ -154,7 +154,7 @@
       "mark_aq": false,
       "copy_z_to_ak": true,
       "enabled": true,
-      "description": "NDH — copy Z to AK"
+      "description": "NDH — copy SIF to Lump Sum"
     },
     {
       "prefix": "GSG",
@@ -167,7 +167,7 @@
       "mark_aq": false,
       "copy_z_to_ak": true,
       "enabled": true,
-      "description": "GSG — copy Z to AK"
+      "description": "GSG — copy SIF to Lump Sum"
     },
     {
       "prefix": "CAV",
@@ -180,7 +180,7 @@
       "mark_aq": false,
       "copy_z_to_ak": true,
       "enabled": true,
-      "description": "CAV — mark AM if 7GMC01, else copy Z to AK"
+      "description": "CAV — mark Prelit if 7GMC01, else copy SIF to Lump Sum"
     },
     {
       "prefix": "CAQ",
@@ -193,7 +193,7 @@
       "mark_aq": false,
       "copy_z_to_ak": true,
       "enabled": true,
-      "description": "CAQ — copy Z to AK"
+      "description": "CAQ — copy SIF to Lump Sum"
     },
     {
       "prefix": "CSF",
@@ -206,7 +206,7 @@
       "mark_aq": false,
       "copy_z_to_ak": true,
       "enabled": true,
-      "description": "CSF — copy Z to AK"
+      "description": "CSF — copy SIF to Lump Sum"
     },
     {
       "prefix": "VIL",

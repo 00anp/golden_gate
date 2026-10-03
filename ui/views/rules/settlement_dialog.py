@@ -24,19 +24,19 @@ def open_settlement_dialog(
         keyboard_type= ft.KeyboardType.NUMBER,
     )
     z_high_field = ft.TextField(
-        label= "Z High", value=str(rule.z_high) if rule else "0.45", width=130,
+        label= "SIF High", value=str(rule.z_high) if rule else "0.45", width=130,
         keyboard_type=ft.KeyboardType.NUMBER,
     )
     ak_high_field = ft.TextField(
-        label= "AK High", value=str(rule.ak_high) if rule else "0.40", width=130,
+        label= "Lump Sum High", value=str(rule.ak_high) if rule else "0.40", width=130,
         keyboard_type= ft.KeyboardType.NUMBER,
     )
     z_low_field = ft.TextField(
-        label="Z Low", value=str(rule.z_low) if rule else "0.50", width=130,
+        label="SIF Low", value=str(rule.z_low) if rule else "0.50", width=130,
         keyboard_type=ft.KeyboardType.NUMBER,
     )
     ak_low_field = ft.TextField(
-        label= "AK Low", value=str(rule.ak_low) if rule else "0.45", width=130,
+        label= "Lump Sum Low", value=str(rule.ak_low) if rule else "0.45", width=130,
         keyboard_type=ft.KeyboardType.NUMBER,
     )
     description_field = ft.TextField(
@@ -47,23 +47,23 @@ def open_settlement_dialog(
 
     # ── Checkboxes ────────────────────────────────────────────────
     mark_am_check = ft.Checkbox(
-        label="Mark AM",
+        label="Mark Prelit",
         value=rule.mark_am if rule else False,
     )
     mark_aq_check = ft.Checkbox(
-        label="Mark AQ",
+        label="Mark Precharge Off",
         value=rule.mark_aq if rule else False,
     )
     copy_z_check = ft.Checkbox(
-        label="Copy Z → AK",
+        label="Copy SIF → Lump Sum",
         value=rule.copy_z_to_ak if rule else False,
     )
     z_greater_check = ft.Checkbox(
-        label="Z > threshold",
+        label="SIF > threshold",
         value=rule.z_greater_than_threshold if rule else False,
     )
     z_lower_check = ft.Checkbox(
-        label="Z < threshold",
+        label="SIF < threshold",
         value=rule.z_lower_than_threshold if rule else False,
     )
 
