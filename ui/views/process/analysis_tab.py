@@ -5,7 +5,7 @@ from ui.views.rules.settlement_dialog import open_settlement_dialog
 from core.models import SettlementRule
 from core.helpers import safe_str
 
-COL_CUSTOMER = 17   # Q — gmc_customer
+COL_CUSTOMER = 17   # Q — tlc_customer
 
 
 def build_analysis_tab(

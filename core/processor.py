@@ -4,11 +4,11 @@ from core.helpers import safe_float, safe_str, ceiling, col_letter_to_index, HEA
 
 
 def apply_settlement_rules(ws, row:int, settlement_rules):
-    gmc_customer_prefix:str = safe_str(ws.cell(row=row, column=17).value)
+    tlc_customer_prefix:str = safe_str(ws.cell(row=row, column=17).value)
     balance:float = safe_float(ws.cell(row=row, column=12).value)
     current_pct:float = safe_float(ws.cell(row=row, column=26).value)
 
-    rule = get_rule(settlement_rules, gmc_customer_prefix)
+    rule = get_rule(settlement_rules, tlc_customer_prefix)
     handled:bool = False
 
     if rule is None:
@@ -68,13 +68,13 @@ def apply_settlement_rules(ws, row:int, settlement_rules):
 
 
 def apply_payment_terms(ws, row:int, settlement, payment_tiers):
-    gmc_customer_prefix:str = safe_str(ws.cell(row=row, column=17).value)
+    tlc_customer_prefix:str = safe_str(ws.cell(row=row, column=17).value)
     tier = get_payment_tier(payment_tiers, settlement) 
 
     if tier is None:
         return
 
-    if gmc_customer_prefix.startswith("LPL"):
+    if tlc_customer_prefix.startswith("LPL"):
         ws.cell(row=row, column=14).value = tier.min_payment
         ws.cell(row=row, column=15).value = tier.max_term_lpl
     else:
@@ -120,8 +120,8 @@ def process_file(input_path:str, progress_callback=None, status_callback=None)->
         # Copy col AD to col AO
         ws.cell(row=i, column=41).value = ws.cell(row=i, column=30).value
 
-        gmc_prefix = safe_str(ws.cell(row=i, column=17).value)
-        rule = get_rule(settlement_rules, gmc_prefix)
+        tlc_prefix = safe_str(ws.cell(row=i, column=17).value)
+        rule = get_rule(settlement_rules, tlc_prefix)
         
         if rule is not None:
             rules_applied[rule.prefix] = rules_applied.get(rule.prefix, 0) + 1

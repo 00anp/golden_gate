@@ -41,6 +41,15 @@ class CompanyPassword:
     delivery_method: str = "requires_password"
     # Valid values: "requires_password" | "sftp" | "sftp_with_password"
 
+
+@dataclass
+class FilterSettings:
+    """Configurable thresholds used by the Review tab.
+    Extend this dataclass to add more user-configurable filter parameters
+    in the future (e.g. recent_payment_days)."""
+    low_balance_threshold: float = 100.0
+
+
 @dataclass
 class ProcessResult:
     success: bool

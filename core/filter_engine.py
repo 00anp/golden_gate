@@ -1,16 +1,17 @@
 import datetime
 from core.helpers import safe_float, safe_str
-from core.rules_engine import get_rule, load_rules
+from core.models import FilterSettings
+from core.rules_engine import get_rule
 
 # Column index constants
-COL_BALANCE  = 12   # L — gmc_current0
-COL_STATUS   = 13   # M — gmc_status
-COL_CUSTOMER = 17   # Q — gmc_customer
-COL_LASTPAID = 20   # T — gmc_lastpaid
-COL_NSFDATE  = 24   # X — gmc_NSFDate
+COL_BALANCE  = 12   # L — tlc_current0
+COL_STATUS   = 13   # M — tlc_status
+COL_CUSTOMER = 17   # Q — tlc_customer
+COL_LASTPAID = 20   # T — tlc_lastpaid
+COL_NSFDATE  = 24   # X — tlc_NSFDate
 
-RECENT_PAYMENT_DAYS   = 31
-LOW_BALANCE_THRESHOLD = 100
+RECENT_PAYMENT_DAYS           = 31
+DEFAULT_LOW_BALANCE_THRESHOLD = 100.0
 
 
 def get_pdc_pcc_rows(ws) -> list[int]:
@@ -24,8 +25,8 @@ def get_pdc_pcc_rows(ws) -> list[int]:
 
 
 def get_prm_ppa_recent_rows(ws) -> list[int]:
-    """Returns rows where col M is PRM or PPA AND gmc_lastpaid (col T)
-    is within 31 days of gmc_NSFDate (col X).
+    """Returns rows where col M is PRM or PPA AND tlc_lastpaid (col T)
+    is within 31 days of tlc_NSFDate (col X).
     If NSFDate is empty, use today as reference."""
     flagged = []
     for i in range(2, ws.max_row + 1):
@@ -54,24 +55,29 @@ def get_prm_ppa_recent_rows(ws) -> list[int]:
     return flagged
 
 
-def get_low_balance_rows(ws) -> list[int]:
-    """Returns rows where col L balance < 100."""
+def get_low_balance_rows(ws, threshold: float = DEFAULT_LOW_BALANCE_THRESHOLD) -> list[int]:
+    """Returns rows where col L balance is strictly less than `threshold`.
+    The threshold is user-configurable via FilterSettings."""
     flagged = []
     for i in range(2, ws.max_row + 1):
         balance = safe_float(ws.cell(i, COL_BALANCE).value)
-        if balance < LOW_BALANCE_THRESHOLD:
+        if balance < threshold:
             flagged.append(i)
     return flagged
 
 
-def get_all_flagged_rows(ws) -> dict:
+def get_all_flagged_rows(ws, settings: FilterSettings | None = None) -> dict:
     """Aggregates all 3 criteria into a single dict.
     Keys map to their respective row lists.
-    Rows can appear in more than one category."""
+    Rows can appear in more than one category.
+
+    If `settings` is None, defaults are used."""
+    threshold = (settings.low_balance_threshold if settings is not None
+                 else DEFAULT_LOW_BALANCE_THRESHOLD)
     return {
         "pdc_pcc":     get_pdc_pcc_rows(ws),
         "prm_ppa":     get_prm_ppa_recent_rows(ws),
-        "low_balance": get_low_balance_rows(ws),
+        "low_balance": get_low_balance_rows(ws, threshold),
     }
 
 

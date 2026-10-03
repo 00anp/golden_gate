@@ -10,6 +10,7 @@
       "mark_am": true,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "VIL — threshold $5,000"
     },
     {
@@ -22,6 +23,7 @@
       "mark_am": true,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "CKS — threshold $5,000"
     },
     {
@@ -34,6 +36,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "FFAM — only applies if Z > 0.45"
     },
     {
@@ -46,6 +49,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "OLU — threshold $5,000"
     },
     {
@@ -58,6 +62,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "OLI — threshold $5,000"
     },
     {
@@ -70,6 +75,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "CAG — threshold $5,000"
     },
     {
@@ -82,6 +88,7 @@
       "mark_am": false,
       "mark_aq": true,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "LPL — fixed rate, mark AQ"
     },
     {
@@ -94,6 +101,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "GAM — threshold $1,250"
     },
     {
@@ -106,6 +114,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "SMF — fixed rate Z=0.50"
     },
     {
@@ -118,6 +127,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "SCS — threshold $1,250"
     },
     {
@@ -130,6 +140,7 @@
       "mark_am": true,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "RSG — mark AM, Z=0.60"
     },
     {
@@ -142,6 +153,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": true,
+      "enabled": true,
       "description": "NDH — copy Z to AK"
     },
     {
@@ -154,6 +166,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": true,
+      "enabled": true,
       "description": "GSG — copy Z to AK"
     },
     {
@@ -166,6 +179,7 @@
       "mark_am": true,
       "mark_aq": false,
       "copy_z_to_ak": true,
+      "enabled": true,
       "description": "CAV — mark AM if 7GMC01, else copy Z to AK"
     },
     {
@@ -178,6 +192,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": true,
+      "enabled": true,
       "description": "CAQ — copy Z to AK"
     },
     {
@@ -190,6 +205,7 @@
       "mark_am": false,
       "mark_aq": false,
       "copy_z_to_ak": true,
+      "enabled": true,
       "description": "CSF — copy Z to AK"
     },
     {
@@ -202,6 +218,7 @@
       "mark_am": true,
       "mark_aq": false,
       "copy_z_to_ak": false,
+      "enabled": true,
       "description": "VIL - High balance"
     }
   ],

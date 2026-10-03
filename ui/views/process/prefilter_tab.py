@@ -1,5 +1,13 @@
 import flet as ft
-from core.filter_engine import get_all_flagged_rows, get_row_preview
+from core.filter_engine import (
+    get_pdc_pcc_rows,
+    get_prm_ppa_recent_rows,
+    get_low_balance_rows,
+    get_row_preview,
+)
+from core.helpers import safe_float
+from core.models import FilterSettings
+from ui.services.filter_settings_service import get_filter_settings, update_filter_settings
 
 PAGE_SIZE_OPTIONS = [25, 50]
 DEFAULT_PAGE_SIZE = 25
@@ -196,18 +204,36 @@ def build_section(
     ])
 
 
+def _format_threshold(value: float) -> str:
+    """Pretty-prints the threshold: '100' instead of '100.0' when integer."""
+    return f"{int(value)}" if float(value).is_integer() else f"{value:g}"
+
+
 def build_prefilter_tab(
     ws,
     on_next: callable,   # on_next(rows_to_remove: set[int])
 ) -> ft.Container:
-    """Builds the Prefilter tab with PDC/PCC, PRM/PPA, and Low Balance sections."""
+    """Builds the Prefilter tab with PDC/PCC, PRM/PPA, and Low Balance sections.
 
-    flagged        = get_all_flagged_rows(ws)
-    rows_to_remove = set()   # mutable, shared across sections
+    The Low Balance threshold is user-editable inline: changing it persists
+    the new value via FilterSettings and rebuilds ONLY the Low Balance
+    section without touching the other two."""
 
-    pdc_pcc_previews = [get_row_preview(ws, r) for r in flagged["pdc_pcc"]]
-    prm_ppa_previews = [get_row_preview(ws, r) for r in flagged["prm_ppa"]]
-    low_bal_previews = [get_row_preview(ws, r) for r in flagged["low_balance"]]
+    # Load persisted settings (with default fallback)
+    settings        = get_filter_settings()
+    threshold_state = [settings.low_balance_threshold]   # mutable wrapper
+
+    rows_to_remove = set()   # shared across sections
+
+    # Compute each criterion individually so Low Balance can be recomputed
+    # later without re-running the other two.
+    pdc_pcc_rows = get_pdc_pcc_rows(ws)
+    prm_ppa_rows = get_prm_ppa_recent_rows(ws)
+    low_bal_rows = get_low_balance_rows(ws, threshold_state[0])
+
+    pdc_pcc_previews = [get_row_preview(ws, r) for r in pdc_pcc_rows]
+    prm_ppa_previews = [get_row_preview(ws, r) for r in prm_ppa_rows]
+    low_bal_previews = [get_row_preview(ws, r) for r in low_bal_rows]
 
     summary_label = ft.Text(value="", italic=True, color=ft.colors.SECONDARY)
 
@@ -227,6 +253,84 @@ def build_prefilter_tab(
         _refresh_summary()
         summary_label.update()
 
+    # ── Low Balance threshold editor ──────────────────────────────
+    threshold_field = ft.TextField(
+        value=_format_threshold(threshold_state[0]),
+        width=120,
+        prefix_text="$ ",
+        keyboard_type=ft.KeyboardType.NUMBER,
+        text_align=ft.TextAlign.RIGHT,
+    )
+    threshold_status = ft.Text(value="", italic=True, color=ft.colors.SECONDARY, size=12)
+
+    # The Low Balance section lives inside this container so we can
+    # swap its content when the threshold changes.
+    low_bal_container = ft.Container()
+
+    def build_low_bal_section() -> ft.Column:
+        return build_section(
+            "Low Balance",
+            f"Rows with balance under ${_format_threshold(threshold_state[0])}",
+            low_bal_previews,
+            rows_to_remove,
+            on_toggle,
+            show_select_all=True,
+            on_bulk_change=on_bulk_change,
+        )
+
+    def on_apply_threshold(event: ft.ControlEvent) -> None:
+        # Validate input
+        try:
+            new_value = float(threshold_field.value)
+            if new_value < 0:
+                raise ValueError("must be non-negative")
+        except (ValueError, TypeError):
+            threshold_status.value = "Please enter a valid non-negative number"
+            threshold_status.color = ft.colors.ERROR
+            threshold_status.update()
+            return
+
+        # Persist + update local state
+        threshold_state[0] = new_value
+        update_filter_settings(FilterSettings(low_balance_threshold=new_value))
+
+        # Recompute Low Balance previews
+        nonlocal low_bal_previews
+        new_rows         = get_low_balance_rows(ws, new_value)
+        low_bal_previews = [get_row_preview(ws, r) for r in new_rows]
+
+        # Rebuild only the Low Balance section content
+        low_bal_container.content = build_low_bal_section()
+        low_bal_container.update()
+
+        # Feedback
+        threshold_status.value = (
+            f"Applied: under ${_format_threshold(new_value)} "
+            f"({len(low_bal_previews)} rows found)"
+        )
+        threshold_status.color = ft.colors.SECONDARY
+        threshold_status.update()
+
+    apply_button = ft.ElevatedButton(
+        content=ft.Row(controls=[ft.Icon(ft.icons.CHECK), ft.Text("Apply")], tight=True),
+        on_click=on_apply_threshold,
+    )
+
+    threshold_editor = ft.Row(
+        controls=[
+            ft.Text("Low Balance threshold:", weight=ft.FontWeight.W_500),
+            threshold_field,
+            apply_button,
+            threshold_status,
+        ],
+        spacing=12,
+        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+    )
+
+    # Initial section build (must come AFTER the editor is defined,
+    # because on_apply_threshold closes over `low_bal_container`)
+    low_bal_container.content = build_low_bal_section()
+
     section_pdc_pcc = build_section(
         "PDC / PCC", "Rows with status PDC or PCC",
         pdc_pcc_previews, rows_to_remove, on_toggle,
@@ -234,12 +338,6 @@ def build_prefilter_tab(
     section_prm_ppa = build_section(
         "PRM / PPA", "Active payment within last 31 days",
         prm_ppa_previews, rows_to_remove, on_toggle,
-    )
-    section_low_bal = build_section(
-        "Low Balance", "Rows with balance under $100",
-        low_bal_previews, rows_to_remove, on_toggle,
-        show_select_all=True,
-        on_bulk_change=on_bulk_change,
     )
 
     def on_next_clicked(event: ft.ControlEvent) -> None:
@@ -255,7 +353,8 @@ def build_prefilter_tab(
                 ft.Divider(),
                 section_prm_ppa,
                 ft.Divider(),
-                section_low_bal,
+                threshold_editor,
+                low_bal_container,
                 ft.Divider(),
                 ft.ElevatedButton(
                     content=ft.Row(

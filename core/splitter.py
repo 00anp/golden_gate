@@ -87,7 +87,7 @@ def split_and_protect(
     for company in companies:
         step        = (1.0 - progress) / max(len(companies), 1)
         company_wb  = build_export_workbook(ws, company)
-        filename    = f"{company}_NEW_GMC_{timestamp}.xlsx"
+        filename    = f"{company}_NEW_TLC_{timestamp}.xlsx"
         company_cfg = passwords.get(company)
 
         # Determine delivery method (default: requires_password)

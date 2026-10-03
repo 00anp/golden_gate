@@ -7,7 +7,7 @@ from ui.views.history_view import build_history_view
 
 def build_app(page: ft.Page) -> None:
 
-    page.title= "Golden Gate"
+    page.title= "TLC Debt Portfolio"
     page.window_width = 1700
     page.window_height = 1100
     page.window_min_width = 1200
